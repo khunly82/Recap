@@ -1,4 +1,5 @@
-﻿using Recap.DAL.Repositories;
+﻿using Recap.BLL.Exceptions;
+using Recap.DAL.Repositories;
 using Recap.Domain.Entities;
 using System;
 using System.Collections.Generic;
@@ -21,13 +22,13 @@ namespace Recap.BLL.Services
             {
                 if(start > end)
                 {
-                    throw new ArgumentException("La date de début doit etre plus petite que la date de fin");
+                    throw new BusinessException("La date de début doit etre plus petite que la date de fin");
                 }
             }
             // vérifier chevauchement
             if (eventRepository.OverlapEvents(start, end ?? start))
             {
-                throw new ArgumentException("Vous ne pouvez pas ajouter 2 evenements qui se chevauchent");
+                throw new BusinessException("Vous ne pouvez pas ajouter 2 evenements qui se chevauchent");
             }
 
             return eventRepository.AddEvent(new CalendarEvent
@@ -44,20 +45,17 @@ namespace Recap.BLL.Services
             {
                 if (start > end)
                 {
-                    throw new ArgumentException("La date de début doit etre plus petite que la date de fin");
+                    throw new BusinessException("La date de début doit etre plus petite que la date de fin");
                 }
             }
             // vérifier chevauchement
             if (eventRepository.OverlapEvents(start, end ?? start, id))
             {
-                throw new ArgumentException("Vous ne pouvez pas ajouter 2 evenements qui se chevauchent");
+                throw new BusinessException("Vous ne pouvez pas ajouter 2 evenements qui se chevauchent");
             }
 
-            CalendarEvent? toUpdate = eventRepository.GetById(id);
-            if(toUpdate is null)
-            {
-                throw new KeyNotFoundException();
-            }
+            CalendarEvent toUpdate = eventRepository.GetById(id) 
+                ?? throw new EntityNotFoundException();
             toUpdate.Title = title;
             toUpdate.Start = start;
             toUpdate.End = end;
@@ -66,11 +64,8 @@ namespace Recap.BLL.Services
 
         public void DeleteEvent(int id)
         {
-            CalendarEvent? toDel = eventRepository.GetById(id);
-            if (toDel is null)
-            {
-                throw new KeyNotFoundException();
-            }
+            CalendarEvent toDel = eventRepository.GetById(id) 
+                ?? throw new EntityNotFoundException();
             eventRepository.DeleteEvent(toDel);
         }
     }

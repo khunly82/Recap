@@ -23,7 +23,13 @@ namespace Recap.API.Middlewares
                 context.Response.StatusCode = 500;
                 context.Response.ContentType = "application/json";
                 await context.Response.WriteAsync(JsonConvert.SerializeObject(new { 
-                    Message = ex.Message, Error = "Erreur de connexion DB" , Type = "Database" }));
+                    ex.Message, Error = "Erreur de connexion DB" , Type = "Database" }));
+            }
+            catch (EntityNotFoundException)
+            {
+                context.Response.StatusCode = 404;
+                context.Response.ContentType = "application/json";
+                
             }
         }
     }
