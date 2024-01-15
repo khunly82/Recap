@@ -1,0 +1,6 @@
+@Recap.API_HostAddress = http://localhost:5212
+
+GET {{Recap.API_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
